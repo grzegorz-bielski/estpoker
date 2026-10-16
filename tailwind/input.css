@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* The room: dark wood all around, one pool of light on the table. */
+@theme {
+  --color-night: #15100b;
+  --color-feltedge: #0a1608;
+}
+
+@layer components {
+  .field {
+    @apply w-full rounded-lg border border-amber-900/70 bg-black/40 px-3 py-2 text-stone-100
+      outline-none placeholder:text-stone-500 focus:border-amber-500;
+  }
+  .btn-deal {
+    @apply cursor-pointer rounded-lg bg-amber-600 px-5 py-2.5 font-semibold text-stone-950
+      shadow-lg shadow-black/50 transition hover:bg-amber-500 active:translate-y-px;
+  }
+  .btn-deal--quiet {
+    @apply bg-stone-700 text-stone-100 hover:bg-stone-600;
+  }
+  .chip {
+    @apply rounded-full border border-stone-700/80 bg-black/30 px-3 py-1 text-stone-300;
+  }
+  .chip-strong {
+    @apply border-amber-700/80 bg-amber-950/50 font-semibold text-amber-200;
+  }
+}
+
+/* -- the table ------------------------------------------------------------- */
+
+.table-felt {
+  @apply relative mx-auto -my-20 flex h-72 w-full max-w-3xl items-center justify-center
+    rounded-[50%] border-8 border-amber-950 shadow-2xl shadow-black/60;
+  background: radial-gradient(ellipse at center, #1c6b32 0%, #14532d 55%, #0d3a20 100%);
+}
+
+.table-felt-brand {
+  @apply select-none text-4xl font-bold tracking-[0.5em] text-black/20;
+}
+
+/* -- cards ----------------------------------------------------------------- */
+
+.card3d {
+  @apply relative h-32 w-20;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1.1);
+}
+.card3d.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  @apply absolute inset-0 flex items-center justify-center rounded-xl border-2 border-stone-400
+    bg-stone-100 text-3xl font-bold text-stone-900;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.45);
+}
+
+.card-back {
+  @apply absolute inset-0 flex items-center justify-center rounded-xl border-2 border-red-950;
+  backface-visibility: hidden;
+  background: repeating-linear-gradient(
+      45deg,
+      #7f1d1d 0 6px,
+      #991b1b 6px 12px
+    );
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.45);
+}
+.card-back-glyph {
+  @apply text-2xl text-red-300/70;
+}
+
+/* -- your hand ------------------------------------------------------------- */
+
+.hand-card {
+  @apply flex h-20 w-14 cursor-pointer items-center justify-center rounded-lg border-2
+    border-stone-400 bg-stone-100 text-2xl font-bold text-stone-900 shadow-md shadow-black/50
+    transition hover:-translate-y-1 hover:border-amber-400;
+}
+.hand-card--raised {
+  @apply -translate-y-2 border-emerald-500 shadow-lg ring-2 ring-emerald-400;
+}

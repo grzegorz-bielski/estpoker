@@ -2,7 +2,7 @@ package components
 
 import io.eezo.core.html.*
 import io.eezo.core.html.Tags.*
-import io.eezo.live.{Component, Event, Init, Live, Topic}
+import io.eezo.live.*
 import models.Phase
 import rooms.Cards
 import rooms.Rooms
@@ -216,7 +216,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
 
   /** Your own deck: every card of it, one click each. The one you laid rides high. */
   private def hand(room: Rooms.Room): Html =
-    laidAlready(room).fold(blankHand) { mine =>
+    laidAlready(room).fold(blankHand)(mine =>
       div(
         Attrs.cls := "mt-10 flex flex-col items-center gap-3",
         p(Attrs.cls := "text-xs uppercase tracking-widest text-stone-400", "Your hand"),
@@ -232,7 +232,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
           )
         )
       )
-    }
+    )
 
   private def blankHand: Html =
     div(
