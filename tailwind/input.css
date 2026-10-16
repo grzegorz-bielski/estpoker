@@ -26,6 +26,37 @@
   }
 }
 
+/* -- the curtain: the room's pieces take the stage in order ----------------- */
+/* Felt first, then the cards spring up over it, then your hand. Runs on the
+   first paint of the page (joined with the view-transition crossfade), and
+   never again — the live differ only patches classes, so nothing re-triggers.
+   People who asked the OS for less motion get none of this. */
+@media (prefers-reduced-motion: no-preference) {
+  .table-felt {
+    animation: felt-in 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+  .card3d {
+    animation: card-pop 0.45s cubic-bezier(0.2, 0.8, 0.35, 1.25) both;
+    animation-delay: 0.14s;
+  }
+  .hand-card {
+    animation: card-pop 0.4s cubic-bezier(0.2, 0.8, 0.35, 1.25) both;
+    animation-delay: 0.26s;
+  }
+}
+@keyframes felt-in {
+  from {
+    opacity: 0;
+    transform: translateY(36px) scale(0.92);
+  }
+}
+@keyframes card-pop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.85);
+  }
+}
+
 /* -- the table ------------------------------------------------------------- */
 
 .table-felt {
