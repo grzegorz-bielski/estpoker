@@ -98,22 +98,24 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       Attrs.cls := "room-scene flex h-dvh w-full flex-col items-center overflow-hidden px-4 pb-3 pt-3",
       marker(room),
       scene(room, revealed),
-      controls(room, revealed)
+      controls(room, revealed),
+      leaveTheTable
     )
 
-  /** The table's name and round, as plain words in the screen's corners — badges got in the way. The road
-    * home sits between them, quiet but always in reach.
-    */
+  /** The table's name and round, as plain words in the screen's corners — badges got in the way. */
   private def marker(room: Rooms.Room): Html =
     div(
-      Attrs.cls := "relative z-10 flex w-full items-center justify-between px-2 text-sm text-stone-300",
+      Attrs.cls := "relative z-10 flex w-full justify-between px-2 text-sm text-stone-300",
       span(span("Table "), strong(Attrs.cls := "tracking-widest text-amber-200", room.session.code)),
-      a(
-        Attrs.cls := "text-xs text-stone-500 transition-colors hover:text-amber-200",
-        Attrs.href := "/",
-        "leave table"
-      ),
       span(span("Round "), strong(room.session.round))
+    )
+
+  /** The one door out of a room: parked in the bottom-right corner, easy to reach, easy to ignore. */
+  private def leaveTheTable: Html =
+    a(
+      Attrs.cls := "relative z-10 mt-auto self-end px-2 pb-1 text-xs text-stone-500 transition-colors hover:text-amber-200",
+      Attrs.href := "/",
+      "leave table"
     )
 
   /** The felt: every seat around it, cards face down or face up as the round says. The felt is the backdrop
