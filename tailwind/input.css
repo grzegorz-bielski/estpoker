@@ -34,6 +34,18 @@
   background: radial-gradient(ellipse at center, #1c6b32 0%, #14532d 55%, #0d3a20 100%);
 }
 
+/* -- the room: the table under one pool of light ---------------------------- */
+
+.room-scene {
+  background:
+    radial-gradient(ellipse 62% 48% at 50% 47%, rgba(28, 107, 50, 0.38) 0%, rgba(23, 92, 31, 0.14) 55%, transparent 76%),
+    radial-gradient(ellipse 55% 26% at 50% 0%, rgba(251, 191, 36, 0.09) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 55% at 6% 50%, rgba(159, 18, 57, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 55% at 94% 50%, rgba(8, 47, 73, 0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 120% 85% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    linear-gradient(180deg, #1e150d 0%, #15100b 58%, #0c110a 100%);
+}
+
 /* -- the launch screen: one casino night ----------------------------------- */
 
 .lobby-scene {

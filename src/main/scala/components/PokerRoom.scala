@@ -82,7 +82,8 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
 
   private def gone: Html =
     div(
-      Attrs.cls := "flex min-h-screen flex-col items-center justify-center gap-4 text-center",
+      Attrs.cls :=
+        "room-scene flex h-dvh flex-col items-center justify-center gap-4 text-center",
       p(Attrs.cls := "text-2xl text-stone-300", "This room folded its cards."),
       a(
         Attrs.cls := "btn-deal no-underline",
@@ -94,7 +95,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private def felted(room: Rooms.Room): Html =
     val revealed = room.session.phase == Phase.Revealed
     div(
-      Attrs.cls := "flex h-dvh w-full flex-col items-center overflow-hidden px-4 pb-3 pt-3",
+      Attrs.cls := "room-scene flex h-dvh w-full flex-col items-center overflow-hidden px-4 pb-3 pt-3",
       marker(room),
       scene(room, revealed),
       controls(room, revealed)
@@ -116,9 +117,19 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       Attrs.cls := "relative flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-4",
       tablecloth,
       ring(room, revealed, firstRow(room)),
+      theRoundReads(room, revealed),
       ring(room, revealed, secondRow(room)),
-      tally(room, revealed)
+      inYourHands(room, revealed)
     )
+
+  /** The table's single number, sitting just above the cards; nothing to read while the backs face you.
+    */
+  private def theRoundReads(room: Rooms.Room, revealed: Boolean): Html =
+    if revealed then verdict(room) else div()
+
+  /** Your deck only rides where it belongs: below your bench, while the round is still young. */
+  private def inYourHands(room: Rooms.Room, revealed: Boolean): Html =
+    if revealed then div() else hand(room)
 
   /** Seats ride two benches around the oval: half above, half below the centre line. */
   private def ring(room: Rooms.Room, revealed: Boolean, seats: List[Rooms.Seat]): Html =
@@ -175,17 +186,13 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private val tablecloth: Html =
     div(Attrs.cls := "table-felt")
 
-  /** The honest verdict of the round, or your own hand while it is being played. */
-  private def tally(room: Rooms.Room, revealed: Boolean): Html =
-    if revealed then verdict(room) else hand(room)
-
   /** The round reads out one number — the table's average — drawn as a caption over a numeral, not a badge.
     */
   private def verdict(room: Rooms.Room): Html =
     val cards = room.seats.flatMap(seat => seat.vote.toList)
     val summary = Cards.summary(cards)
     div(
-      Attrs.cls := "relative z-10 mt-4 flex flex-col items-center gap-1",
+      Attrs.cls := "relative z-10 flex flex-col items-center gap-0.5",
       summary.average.fold(div())(avg =>
         span(Attrs.cls := "text-xs uppercase tracking-widest text-stone-400", "average") ++ span(
           Attrs.cls := "text-5xl font-bold text-amber-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]",

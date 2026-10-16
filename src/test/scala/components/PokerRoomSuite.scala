@@ -104,11 +104,13 @@ class PokerRoomSuite extends FunSuite:
     assert(dealer.contains("then deal again"), dealer)
     assert(!onlooker.contains("then deal again"), onlooker)
     assert(onlooker.contains("Waiting for the dealer"), onlooker)
+    assert(onlooker.indexOf("average") < onlooker.indexOf(">Grace<"), "the average reads above the table")
 
   test("the room is drawn face down while voting, face up once revealed"):
     val (session, mod) = db(Rooms.create("Ada"))
     val comp = room(seat(session, mod, name = "Ada", mod = true))
     val voting = db(comp.render(comp.load)).render
+    assert(voting.contains("room-scene"), "the room sits in the casino light, not a black void")
     assert(voting.contains("card3d"), voting)
     assert(!voting.contains("still thinking"), voting)
     assert(!voting.contains("has voted"), voting)
