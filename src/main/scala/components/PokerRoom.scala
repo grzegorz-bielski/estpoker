@@ -93,29 +93,29 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
 
   private def felted(room: Rooms.Room): Html =
     val revealed = room.session.phase == Phase.Revealed
-    val round = room.session.round
     div(
-      Attrs.cls := "flex min-h-screen w-full flex-col items-center px-4 pb-12 pt-8",
-      marker(room, round),
+      Attrs.cls := "flex h-dvh w-full flex-col items-center overflow-hidden px-4 pb-3 pt-3",
+      marker(room),
       scene(room, revealed),
       controls(room, revealed)
     )
 
-  /** The small strip that names the table and counts the hands. */
-  private def marker(room: Rooms.Room, round: Int): Html =
+  /** The table's name and round, as plain words in the screen's corners — badges got in the way. */
+  private def marker(room: Rooms.Room): Html =
     div(
-      Attrs.cls := "mb-4 flex flex-wrap items-center justify-center gap-3 text-sm",
-      span(Attrs.cls := "chip chip-strong", "Table ", room.session.code),
-      span(Attrs.cls := "chip", "Round ", round),
-      span(Attrs.cls := "chip", "a few days left")
+      Attrs.cls := "relative z-10 flex w-full justify-between px-2 text-sm text-stone-300",
+      span(span("Table "), strong(Attrs.cls := "tracking-widest text-amber-200", room.session.code)),
+      span(span("Round "), strong(room.session.round))
     )
 
-  /** The felt: every seat around it, cards face down or face up as the round says. */
+  /** The felt: every seat around it, cards face down or face up as the round says. The felt is the backdrop
+    * now — an absolutely placed oval the benches ride *on*, never under, on every screen.
+    */
   private def scene(room: Rooms.Room, revealed: Boolean): Html =
     div(
-      Attrs.cls := "flex w-full max-w-5xl flex-col items-center gap-2",
-      ring(room, revealed, firstRow(room)),
+      Attrs.cls := "relative flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-4",
       tablecloth,
+      ring(room, revealed, firstRow(room)),
       ring(room, revealed, secondRow(room)),
       tally(room, revealed)
     )
@@ -123,7 +123,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   /** Seats ride two benches around the oval: half above, half below the centre line. */
   private def ring(room: Rooms.Room, revealed: Boolean, seats: List[Rooms.Seat]): Html =
     div(
-      Attrs.cls := "flex flex-wrap items-end justify-center gap-6",
+      Attrs.cls := "relative z-10 flex flex-wrap items-end justify-center gap-6",
       seats.map(person(room, revealed))
     )
 
@@ -177,8 +177,8 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       if laid then "has voted" else "still thinking"
     )
 
-  /** The felt itself, under every card: pure decoration, patched but never diffed for content. Small tables
-    * stay small and only the middle of larger screens gets the big oval, so nothing rides under it.
+  /** The felt itself, under every card: pure decoration, patched but never diffed for content. It sits
+    * absolutely behind the benches, so its edges can never cover a name, a card, or a word.
     */
   private val tablecloth: Html =
     div(Attrs.cls := "table-felt")
@@ -191,7 +191,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
     val cards = room.seats.flatMap(seat => seat.vote.toList)
     val summary = Cards.summary(cards)
     div(
-      Attrs.cls := "mt-6 flex w-full max-w-3xl flex-col items-center gap-4",
+      Attrs.cls := "relative z-10 mt-4 flex w-full max-w-3xl flex-col items-center gap-3",
       div(
         Attrs.cls := "flex flex-wrap items-center justify-center gap-4",
         summary.average.map(avg =>
@@ -214,7 +214,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private def hand(room: Rooms.Room): Html =
     laidAlready(room).fold(blankHand)(mine =>
       div(
-        Attrs.cls := "mt-10 flex flex-col items-center gap-3",
+        Attrs.cls := "relative z-10 mt-4 flex flex-col items-center gap-2",
         p(Attrs.cls := "text-xs uppercase tracking-widest text-stone-400", "Your hand"),
         div(
           Attrs.cls := "flex flex-wrap items-center justify-center gap-2",
@@ -232,7 +232,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
 
   private def blankHand: Html =
     div(
-      Attrs.cls := "mt-10 text-stone-500",
+      Attrs.cls := "relative z-10 mt-6 text-stone-500",
       "Waiting for the first cards to land."
     )
 
@@ -245,7 +245,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       case Phase.Voting   => "Waiting for every vote to land."
       case Phase.Revealed => "Read the cards, then deal again."
     div(
-      Attrs.cls := "mt-8 flex flex-col items-center gap-3",
+      Attrs.cls := "relative z-10 mt-3 flex flex-col items-center gap-2",
       p(Attrs.cls := "text-sm text-stone-400", strings),
       if revealed && seat.mod then
         button(Live.onClick("reset"), Attrs.cls := "btn-deal", "Deal the next round")

@@ -21,7 +21,7 @@ object Pages:
           link(Attrs.rel := "stylesheet", Attrs.href := "/tailwindcss")
         ),
         body(
-          Attrs.cls := "min-h-screen bg-night text-stone-100 font-sans antialiased",
+          Attrs.cls := "h-dvh overflow-hidden bg-night text-stone-100 font-sans antialiased",
           content
         )
       )
@@ -52,7 +52,9 @@ object Pages:
       ) ++ extra
     )
 
-  /** The one control a seat needs: a name. The code itself is where the address decides. */
+  /** The one control a seat needs: a name. The code itself is where the address decides. The submit button
+    * rides inside the form — outside one, a browser refuses to fire it.
+    */
   def seatForm(
       action: String,
       csrf: Csrf.Token,
@@ -62,10 +64,9 @@ object Pages:
     Pages.form(
       action,
       csrf,
-      (code.map(c => Pages.field("table code", "code", c)).toList :+ Pages
-        .field("your name", "name", remembered))*
-    ) ++ button(
-      Attrs.cls := "btn-deal",
-      Attrs.tpe := "submit",
-      "Take a seat"
+      (code.map(c => Pages.field("table code", "code", c)).toList :+ Pages.field(
+        "your name",
+        "name",
+        remembered
+      ) :+ button(Attrs.cls := "btn-deal", Attrs.tpe := "submit", "Take a seat"))*
     )

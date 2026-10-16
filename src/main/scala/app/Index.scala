@@ -7,25 +7,36 @@ import io.eezo.http.Response
 
 import estpoker.pages.Pages
 
-/** `app/Index.scala` mounts `GET /`: the lobby. Deal a fresh table, or walk into one by code. */
+/** `app/Index.scala` mounts `GET /`: the launch screen. Two doors, shut until they are knocked on: take a
+  * seat at a table someone else holds, or deal one of your own. The doors are native `details` elements
+  * sharing one `name`, so the browser opens exactly one without a line of script.
+  */
 object Index:
+
+  /** eezo's tag list stops before the disclosure pair; the constructor is right there. */
+  private val details = Tag("details")
+  private val summary = Tag("summary")
 
   def index(request: Request): Response =
     val remembered = request.session.get("playerName").getOrElse("")
     val notice = request.session.flash("notice")
     Pages.shell(
-      "estpoker",
+      "estimation poker",
       request.csrf,
       main(
-        Attrs.cls := "flex min-h-screen flex-col items-center justify-center px-4 pb-16",
+        Attrs.cls := "flex h-dvh flex-col items-center justify-center px-4",
+        p(
+          Attrs.cls := "text-sm uppercase tracking-[0.35em] text-amber-300/90",
+          "estimation"
+        ),
         h1(
           Attrs.cls :=
-            "text-3xl font-bold tracking-[0.3em] text-amber-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-5xl",
-          "E-ST-PO-KER"
+            "mb-2 text-4xl font-bold tracking-[0.35em] text-amber-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-5xl",
+          "POKER"
         ),
         p(
-          Attrs.cls := "mt-3 mb-10 text-lg text-stone-300",
-          "planning poker at a real table — deal a room, share the link, play"
+          Attrs.cls := "mb-10 text-sm text-stone-400",
+          "deal a table, share the link, estimate as a table"
         ),
         notice.map(msg =>
           p(
@@ -34,22 +45,34 @@ object Index:
           )
         ),
         div(
-          Attrs.cls := "flex w-full max-w-md flex-col gap-8",
-          Pages.form(
-            "/",
-            request.csrf,
-            Pages.field("your name", "name", remembered),
-            button(
-              Attrs.cls := "btn-deal",
-              Attrs.tpe := "submit",
-              "Deal a table"
+          Attrs.cls := "flex w-full max-w-md flex-col gap-3",
+          details(
+            Attrs.name := "lobby",
+            summary(
+              Attrs.cls := "btn-deal select-none text-center",
+              "Take a seat"
+            ),
+            div(
+              Attrs.cls := "mt-3 rounded-xl border border-stone-700/60 bg-black/30 p-4",
+              Pages.seatForm("/s/join", request.csrf, remembered, code = Some(""))
             )
           ),
-          Pages.seatForm("/s/join", request.csrf, remembered, code = Some(""))
-        ),
-        footer(
-          Attrs.cls := "mt-12 text-sm text-stone-500",
-          "cards hidden until everyone has voted"
+          details(
+            Attrs.name := "lobby",
+            summary(
+              Attrs.cls := "btn-deal btn-deal--quiet select-none text-center",
+              "Deal a table"
+            ),
+            div(
+              Attrs.cls := "mt-3 rounded-xl border border-stone-700/60 bg-black/30 p-4",
+              Pages.form(
+                "/",
+                request.csrf,
+                Pages.field("your name", "name", remembered),
+                button(Attrs.cls := "btn-deal", Attrs.tpe := "submit", "Deal it")
+              )
+            )
+          )
         )
       )
     )

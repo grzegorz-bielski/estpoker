@@ -88,6 +88,31 @@ class RoutesSuite extends FunSuite:
     assert(body.contains("""name="code""""), body)
     assert(body.contains("join"), body)
 
+  test("the launch screen is two doors, and each form carries its own submit — join once lost its button"):
+    val body = html(get("/"))
+    assert(body.contains(">Take a seat<"), body)
+    assert(body.contains(">Deal a table<"), body)
+    assert(body.contains("""name="lobby""""), body)
+    val forms = """<form[^>]*>(?s).*?</form>""".r.findAllMatchIn(body).toList
+    assertEquals(forms.size, 2, body)
+    forms.foreach(form =>
+      assert(form.matched.contains("type=\"submit\""), s"a submit button left its form: ${form.matched}")
+    )
+
+  test("the room keeps its marks to plain words in the corners"):
+    val (session, mod) = TestDb.around(Rooms.create("Ada"))
+    val (_, token, s) = read("/")
+    val room = get(s"/s/${session.code}", s.set(s"seat.${session.code}", mod.id.show))
+    val body = html(room)
+    assert(
+      body.contains(
+        s"""<strong class="tracking-widest text-amber-200">${session.code}</strong>"""
+      ),
+      body
+    )
+    assert(body.contains("<span>Round </span><strong>1</strong>"), body)
+    assert(!body.contains("a few days left"), body)
+
   test("dealing seats the creator on a fresh table"):
     val (_, token, session) = read("/")
     val response = post("/", s"_csrf=$token&name=Ada", session)

@@ -29,15 +29,24 @@
 /* -- the table ------------------------------------------------------------- */
 
 .table-felt {
-  @apply relative mx-auto flex h-44 w-full max-w-3xl items-center justify-center rounded-[50%]
-    border-8 border-amber-950 shadow-2xl shadow-black/60 sm:-my-16 sm:h-72;
+  @apply absolute left-1/2 top-1/2 h-[58%] max-h-72 w-[92%] max-w-3xl -translate-x-1/2 -translate-y-1/2
+    rounded-[50%] border-8 border-amber-950 shadow-2xl shadow-black/60;
   background: radial-gradient(ellipse at center, #1c6b32 0%, #14532d 55%, #0d3a20 100%);
+}
+
+/* -- the launch doors ------------------------------------------------------ */
+
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
 }
 
 /* -- cards ----------------------------------------------------------------- */
 
 .card3d {
-  @apply relative h-32 w-20;
+  @apply relative h-24 w-16 sm:h-32 sm:w-20;
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1.1);
 }
@@ -47,7 +56,7 @@
 
 .card-face {
   @apply absolute inset-0 flex items-center justify-center rounded-xl border-2 border-stone-400
-    bg-stone-100 text-3xl font-bold text-stone-900;
+    bg-stone-100 text-2xl font-bold text-stone-900 sm:text-3xl;
   backface-visibility: hidden;
   transform: rotateY(180deg);
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.45);
@@ -70,9 +79,9 @@
 /* -- your hand ------------------------------------------------------------- */
 
 .hand-card {
-  @apply flex h-20 w-14 cursor-pointer items-center justify-center rounded-lg border-2
-    border-stone-400 bg-stone-100 text-2xl font-bold text-stone-900 shadow-md shadow-black/50
-    transition hover:-translate-y-1 hover:border-amber-400;
+  @apply flex h-16 w-11 cursor-pointer items-center justify-center rounded-lg border-2
+    border-stone-400 bg-stone-100 text-lg font-bold text-stone-900 shadow-md shadow-black/50
+    transition hover:-translate-y-1 hover:border-amber-400 sm:h-20 sm:w-14 sm:text-2xl;
 }
 .hand-card--raised {
   @apply -translate-y-2 border-emerald-500 shadow-lg ring-2 ring-emerald-400;
