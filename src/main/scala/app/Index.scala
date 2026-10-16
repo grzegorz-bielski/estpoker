@@ -19,7 +19,8 @@ object Index:
       main(
         Attrs.cls := "flex min-h-screen flex-col items-center justify-center px-4 pb-16",
         h1(
-          Attrs.cls := "text-5xl font-bold tracking-[0.3em] text-amber-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]",
+          Attrs.cls :=
+            "text-3xl font-bold tracking-[0.3em] text-amber-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-5xl",
           "E-ST-PO-KER"
         ),
         p(

@@ -177,12 +177,11 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       if laid then "has voted" else "still thinking"
     )
 
-  /** The felt itself, under every card: pure decoration, patched but never diffed for content. */
+  /** The felt itself, under every card: pure decoration, patched but never diffed for content. Small tables
+    * stay small and only the middle of larger screens gets the big oval, so nothing rides under it.
+    */
   private val tablecloth: Html =
-    div(
-      Attrs.cls := "table-felt",
-      span(Attrs.cls := "table-felt-brand", "E ST PO KER")
-    )
+    div(Attrs.cls := "table-felt")
 
   /** The honest verdict of the round, or your own hand while it is being played. */
   private def tally(room: Rooms.Room, revealed: Boolean): Html =

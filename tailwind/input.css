@@ -29,13 +29,9 @@
 /* -- the table ------------------------------------------------------------- */
 
 .table-felt {
-  @apply relative mx-auto -my-20 flex h-72 w-full max-w-3xl items-center justify-center
-    rounded-[50%] border-8 border-amber-950 shadow-2xl shadow-black/60;
+  @apply relative mx-auto flex h-44 w-full max-w-3xl items-center justify-center rounded-[50%]
+    border-8 border-amber-950 shadow-2xl shadow-black/60 sm:-my-16 sm:h-72;
   background: radial-gradient(ellipse at center, #1c6b32 0%, #14532d 55%, #0d3a20 100%);
-}
-
-.table-felt-brand {
-  @apply select-none text-4xl font-bold tracking-[0.5em] text-black/20;
 }
 
 /* -- cards ----------------------------------------------------------------- */
