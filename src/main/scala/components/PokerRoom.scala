@@ -137,8 +137,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
     div(
       Attrs.cls := "flex flex-col items-center gap-2",
       nameOf(place),
-      cardFor(room, revealed, place),
-      hint(place)
+      cardFor(room, revealed, place)
     )
 
   private def nameOf(place: Rooms.Seat): Html =
@@ -170,13 +169,6 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private def cardMount(revealed: Boolean, place: Rooms.Seat): String =
     "card3d" + (if revealed then " flipped" else "")
 
-  private def hint(place: Rooms.Seat): Html =
-    val laid = place.vote.isDefined
-    span(
-      Attrs.cls := "text-xs " + (if laid then "text-emerald-300" else "text-stone-500"),
-      if laid then "has voted" else "still thinking"
-    )
-
   /** The felt itself, under every card: pure decoration, patched but never diffed for content. It sits
     * absolutely behind the benches, so its edges can never cover a name, a card, or a word.
     */
@@ -187,26 +179,18 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private def tally(room: Rooms.Room, revealed: Boolean): Html =
     if revealed then verdict(room) else hand(room)
 
+  /** The round reads out one number — the table's average — drawn as a caption over a numeral, not a badge.
+    */
   private def verdict(room: Rooms.Room): Html =
     val cards = room.seats.flatMap(seat => seat.vote.toList)
     val summary = Cards.summary(cards)
     div(
-      Attrs.cls := "relative z-10 mt-4 flex w-full max-w-3xl flex-col items-center gap-3",
-      div(
-        Attrs.cls := "flex flex-wrap items-center justify-center gap-4",
-        summary.average.map(avg =>
-          span(
-            Attrs.cls := "chip chip-strong text-lg",
-            "average ",
-            strong(avg)
-          )
-        ),
-        summary.lowest.map(low => span(Attrs.cls := "chip", "low ", strong(low))),
-        summary.highest.map(high => span(Attrs.cls := "chip", "high ", strong(high)))
-      ),
-      div(
-        Attrs.cls := "flex flex-wrap items-center justify-center gap-2",
-        summary.counts.map((face, howMany) => span(Attrs.cls := "chip", face, " × ", howMany))
+      Attrs.cls := "relative z-10 mt-4 flex flex-col items-center gap-1",
+      summary.average.fold(div())(avg =>
+        span(Attrs.cls := "text-xs uppercase tracking-widest text-stone-400", "average") ++ span(
+          Attrs.cls := "text-5xl font-bold text-amber-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]",
+          avg
+        )
       )
     )
 
@@ -243,7 +227,9 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private def controls(room: Rooms.Room, revealed: Boolean): Html =
     val strings = room.session.phase match
       case Phase.Voting   => "Waiting for every vote to land."
-      case Phase.Revealed => "Read the cards, then deal again."
+      case Phase.Revealed =>
+        if seat.mod then "Read the cards, then deal again."
+        else "Waiting for the dealer to deal the next round."
     div(
       Attrs.cls := "relative z-10 mt-3 flex flex-col items-center gap-2",
       p(Attrs.cls := "text-sm text-stone-400", strings),

@@ -34,6 +34,28 @@
   background: radial-gradient(ellipse at center, #1c6b32 0%, #14532d 55%, #0d3a20 100%);
 }
 
+/* -- the launch screen: one casino night ----------------------------------- */
+
+.lobby-scene {
+  background:
+    radial-gradient(ellipse 55% 30% at 50% 8%, rgba(251, 191, 36, 0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 90% 42% at 50% 112%, #175c1f 0%, rgba(23, 92, 31, 0.4) 55%, transparent 75%),
+    radial-gradient(ellipse 45% 55% at 12% 45%, rgba(159, 18, 57, 0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 55% at 88% 55%, rgba(8, 47, 73, 0.25) 0%, transparent 70%),
+    linear-gradient(180deg, #1e150d 0%, #15100b 55%, #0d120a 100%);
+}
+
+.suit-s,
+.suit-h,
+.suit-d,
+.suit-c {
+  @apply pointer-events-none absolute select-none text-7xl blur-[1px] sm:text-8xl;
+}
+.suit-s  { @apply text-emerald-300/15 -rotate-12; }
+.suit-h  { @apply rotate-6 text-rose-400/15; }
+.suit-d  { @apply -rotate-6 text-rose-400/10; }
+.suit-c  { @apply rotate-12 text-emerald-300/10; }
+
 /* -- the launch doors ------------------------------------------------------ */
 
 summary {

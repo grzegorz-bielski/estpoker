@@ -9,7 +9,8 @@ import estpoker.pages.Pages
 
 /** `app/Index.scala` mounts `GET /`: the launch screen. Two doors, shut until they are knocked on: take a
   * seat at a table someone else holds, or deal one of your own. The doors are native `details` elements
-  * sharing one `name`, so the browser opens exactly one without a line of script.
+  * sharing one `name`, so the browser opens exactly one without a line of script. Set dressing — a spotlight,
+  * a felt pool, drifting suits — comes from `.lobby-scene` in the stylesheet.
   */
 object Index:
 
@@ -24,19 +25,24 @@ object Index:
       "estimation poker",
       request.csrf,
       main(
-        Attrs.cls := "flex h-dvh flex-col items-center justify-center px-4",
+        Attrs.cls := "lobby-scene relative flex h-dvh flex-col items-center justify-center px-4",
+        // a gold hairline frames the room, and four suits idle at the edges of the light
+        div(
+          Attrs.cls :=
+            "pointer-events-none absolute inset-2 rounded-3xl ring-1 ring-amber-400/15 sm:inset-4"
+        ),
+        span(Attrs.cls := "suit-s top-[6%] left-[7%]", "♠"),
+        span(Attrs.cls := "suit-h top-[12%] right-[8%]", "♥"),
+        span(Attrs.cls := "suit-d bottom-[10%] right-[10%]", "♦"),
+        span(Attrs.cls := "suit-c bottom-[16%] left-[9%]", "♣"),
         p(
           Attrs.cls := "text-sm uppercase tracking-[0.35em] text-amber-300/90",
           "estimation"
         ),
         h1(
           Attrs.cls :=
-            "mb-2 text-4xl font-bold tracking-[0.35em] text-amber-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-5xl",
+            "mb-10 text-4xl font-bold tracking-[0.35em] text-amber-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-5xl",
           "POKER"
-        ),
-        p(
-          Attrs.cls := "mb-10 text-sm text-stone-400",
-          "deal a table, share the link, estimate as a table"
         ),
         notice.map(msg =>
           p(
@@ -53,7 +59,7 @@ object Index:
               "Take a seat"
             ),
             div(
-              Attrs.cls := "mt-3 rounded-xl border border-stone-700/60 bg-black/30 p-4",
+              Attrs.cls := "mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
               Pages.seatForm("/s/join", request.csrf, remembered, code = Some(""))
             )
           ),
@@ -64,7 +70,7 @@ object Index:
               "Deal a table"
             ),
             div(
-              Attrs.cls := "mt-3 rounded-xl border border-stone-700/60 bg-black/30 p-4",
+              Attrs.cls := "mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
               Pages.form(
                 "/",
                 request.csrf,

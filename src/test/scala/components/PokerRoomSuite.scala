@@ -92,11 +92,26 @@ class PokerRoomSuite extends FunSuite:
     val before = db(comp.load)
     assertEquals(comp.handle(Event("knock-knock"), before), before)
 
+  test("only the dealer is told to deal again once the cards show"):
+    val (session, mod) = db(Rooms.create("Ada"))
+    val (_, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("no seat"))
+    val modPage = room(seat(session, mod, name = "Ada", mod = true))
+    val gracePage = room(seat(session, grace, name = "Grace", mod = false))
+    db(Rooms.play(mod.id, session.id, "8"))
+    db(Rooms.play(grace.id, session.id, "13"))
+    val dealer = db(modPage.render(modPage.load)).render
+    val onlooker = db(gracePage.render(gracePage.load)).render
+    assert(dealer.contains("then deal again"), dealer)
+    assert(!onlooker.contains("then deal again"), onlooker)
+    assert(onlooker.contains("Waiting for the dealer"), onlooker)
+
   test("the room is drawn face down while voting, face up once revealed"):
     val (session, mod) = db(Rooms.create("Ada"))
     val comp = room(seat(session, mod, name = "Ada", mod = true))
     val voting = db(comp.render(comp.load)).render
     assert(voting.contains("card3d"), voting)
+    assert(!voting.contains("still thinking"), voting)
+    assert(!voting.contains("has voted"), voting)
     assert(!voting.contains("flipped"), "expected the cards face down before a reveal")
     assert(voting.contains("Reveal now"), voting)
     assert(voting.contains("Waiting"), voting)
@@ -107,6 +122,10 @@ class PokerRoomSuite extends FunSuite:
     val revealed = db(comp.render(comp.load)).render
     assert(revealed.contains("flipped"), revealed)
     assert(revealed.contains("average"), revealed)
+    assert(!revealed.contains("chip"), "the verdict is a reading, not a row of badges")
+    assert(!revealed.contains("low "), revealed)
+    assert(!revealed.contains("high "), revealed)
+    assert(!revealed.contains(" × "), revealed)
     assert(revealed.contains("Deal the next round"), revealed)
 
   test("a view whose room has folded is drawn as gone"):
