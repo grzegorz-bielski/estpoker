@@ -79,9 +79,10 @@ summary::-webkit-details-marker {
   display: none;
 }
 
-/* Opening: the panel fades and settles, everywhere (a close snaps — the DOM
-   is still native). The block-size transition then resmooths both directions
-   where ::details-content is known. */
+/* Opening: the panel fades and settles. Height animates two ways: Chromium's
+   ::details-content does block-size, and everywhere else (iOS Safari among
+   them) a 0fr→1fr grid fold on the wrapper takes over. A close snaps in
+   Safari — the DOM is still native details. */
 details .reveal {
   animation: door-open 0.28s ease-out;
 }
@@ -92,6 +93,18 @@ details .reveal {
   }
 }
 
+details .fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+details[open] .fold {
+  grid-template-rows: 1fr;
+}
+details .fold > .reveal {
+  min-height: 0;
+  overflow: hidden;
+}
 details .reveal {
   overflow: clip;
 }

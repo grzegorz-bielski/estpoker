@@ -59,9 +59,12 @@ object Index:
               "Take a seat"
             ),
             div(
-              Attrs.cls :=
-                "reveal mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
-              Pages.seatForm("/s/join", request.csrf, remembered, code = Some(""))
+              Attrs.cls := "fold",
+              div(
+                Attrs.cls :=
+                  "reveal rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
+                Pages.seatForm("/s/join", request.csrf, remembered, code = Some(""))
+              )
             )
           ),
           details(
@@ -71,13 +74,16 @@ object Index:
               "Deal a table"
             ),
             div(
-              Attrs.cls :=
-                "reveal mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
-              Pages.form(
-                "/",
-                request.csrf,
-                Pages.field("your name", "name", remembered),
-                button(Attrs.cls := "btn-deal", Attrs.tpe := "submit", "Deal it")
+              Attrs.cls := "fold",
+              div(
+                Attrs.cls :=
+                  "reveal rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
+                Pages.form(
+                  "/",
+                  request.csrf,
+                  Pages.field("your name", "name", remembered),
+                  button(Attrs.cls := "btn-deal", Attrs.tpe := "submit", "Deal it")
+                )
               )
             )
           )
