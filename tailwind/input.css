@@ -79,6 +79,32 @@ summary::-webkit-details-marker {
   display: none;
 }
 
+/* -- crossing between screens: one view dissolves into the next ------------- */
+/* Pure CSS view transitions for same-origin navigations: the launch screen and
+   a room crossfade with a small drift. Engines without the API simply cut. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: vt-out 0.22s ease-in both;
+}
+::view-transition-new(root) {
+  animation: vt-in 0.3s ease-out both;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(1.012);
+  }
+}
+
 /* Opening: the panel fades and settles. Height animates two ways: Chromium's
    ::details-content does block-size, and everywhere else (iOS Safari among
    them) a 0fr→1fr grid fold on the wrapper takes over. A close snaps in

@@ -18,7 +18,7 @@ object Pages:
           meta(Attrs.charset := "utf-8"),
           meta(Attrs.name := "viewport", Attrs.content := "width=device-width, initial-scale=1"),
           title(subject),
-          link(Attrs.rel := "stylesheet", Attrs.href := "/tailwindcss?v=2")
+          link(Attrs.rel := "stylesheet", Attrs.href := "/tailwindcss?v=3")
         ),
         body(
           Attrs.cls := "h-dvh overflow-hidden bg-night text-stone-100 font-sans antialiased",
