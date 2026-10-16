@@ -15,7 +15,7 @@ object SeatUp:
     else if code.isEmpty then TakeSeat.out(request, "a table code is wanted or nothing happens")
     else
       Rooms.join(code, name) match
-        case Left(Rooms.JoinError.Unknown) => TakeSeat.out(request, "no table answers that code")
+        case Left(Rooms.JoinError.Unknown) => TakeSeat.out(request, "no table found")
         case Left(Rooms.JoinError.Expired) =>
           TakeSeat.out(request, "that table's chips are in the dark already")
         case Left(Rooms.JoinError.Full) =>
