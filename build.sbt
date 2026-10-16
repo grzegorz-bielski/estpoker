@@ -20,5 +20,9 @@ Test / parallelExecution := false
 // The braceless rule is enforced, not aspirational: every compile formats first.
 scalafmtOnCompile := true
 
+// A stable secret so seat cookies survive a restart during local play; a deploy is expected
+// to set EEZO_SECRET itself, the way the eezo http module wants it.
+Compile / run / envVars += "EEZO_SECRET" -> "Qp7Xk2mWrvE8hLJd3yB9tN5zS6fGc4A1"
+
 // -- test
 libraryDependencies += "org.scalameta" %% "munit" % "1.3.4" % Test
