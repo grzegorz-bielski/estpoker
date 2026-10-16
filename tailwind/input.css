@@ -27,22 +27,37 @@
 }
 
 /* -- the curtain: the room's pieces take the stage in order ----------------- */
-/* Felt first, then the cards spring up over it, then your hand. Runs on the
-   first paint of the page (joined with the view-transition crossfade), and
-   never again — the live differ only patches classes, so nothing re-triggers.
+/* Felt first, then the cards spring up over it, then your hand — one card at a
+   time, left to right, each falling in from a little above. Runs on the first
+   paint of the page (joined with the view-transition crossfade). The fill
+   stays `backwards`: when an entrance ends, the element must answer to its own
+   transforms again (the reveal flip, the hand-card hover both rely on it).
    People who asked the OS for less motion get none of this. */
 @media (prefers-reduced-motion: no-preference) {
   .table-felt {
-    animation: felt-in 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    animation: felt-in 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
   }
   .card3d {
-    animation: card-pop 0.45s cubic-bezier(0.2, 0.8, 0.35, 1.25) both;
+    animation: card-pop 0.45s cubic-bezier(0.2, 0.8, 0.35, 1.25) backwards;
     animation-delay: 0.14s;
   }
   .hand-card {
-    animation: card-pop 0.4s cubic-bezier(0.2, 0.8, 0.35, 1.25) both;
-    animation-delay: 0.26s;
+    animation: hand-drop 0.4s cubic-bezier(0.2, 0.8, 0.35, 1.25) backwards;
   }
+  .hand-card:nth-child(1)  { animation-delay: 0.12s; }
+  .hand-card:nth-child(2)  { animation-delay: 0.155s; }
+  .hand-card:nth-child(3)  { animation-delay: 0.19s; }
+  .hand-card:nth-child(4)  { animation-delay: 0.225s; }
+  .hand-card:nth-child(5)  { animation-delay: 0.26s; }
+  .hand-card:nth-child(6)  { animation-delay: 0.295s; }
+  .hand-card:nth-child(7)  { animation-delay: 0.33s; }
+  .hand-card:nth-child(8)  { animation-delay: 0.365s; }
+  .hand-card:nth-child(9)  { animation-delay: 0.4s; }
+  .hand-card:nth-child(10) { animation-delay: 0.435s; }
+  .hand-card:nth-child(11) { animation-delay: 0.47s; }
+  .hand-card:nth-child(12) { animation-delay: 0.505s; }
+  .hand-card:nth-child(13) { animation-delay: 0.54s; }
+  .hand-card:nth-child(14) { animation-delay: 0.575s; }
 }
 @keyframes felt-in {
   from {
@@ -54,6 +69,12 @@
   from {
     opacity: 0;
     transform: translateY(16px) scale(0.85);
+  }
+}
+@keyframes hand-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.9);
   }
 }
 
