@@ -95,7 +95,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
   private def felted(room: Rooms.Room): Html =
     val revealed = room.session.phase == Phase.Revealed
     div(
-      Attrs.cls := "room-scene flex h-dvh w-full flex-col items-center overflow-hidden px-4 pb-3 pt-3",
+      Attrs.cls := "room-scene relative flex h-dvh w-full flex-col items-center overflow-hidden px-4 pb-3 pt-3",
       marker(room),
       scene(room, revealed),
       controls(room, revealed),
@@ -110,10 +110,10 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       span(span("Round "), strong(room.session.round))
     )
 
-  /** The one door out of a room: parked in the bottom-right corner, easy to reach, easy to ignore. */
+  /** The one door out of a room: pinned to the bottom-right corner, easy to reach, easy to ignore. */
   private def leaveTheTable: Html =
     a(
-      Attrs.cls := "relative z-10 mt-auto self-end px-2 pb-1 text-xs text-stone-500 transition-colors hover:text-amber-200",
+      Attrs.cls := "absolute bottom-2 right-4 z-10 text-xs text-stone-500 transition-colors hover:text-amber-200",
       Attrs.href := "/",
       "leave table"
     )
