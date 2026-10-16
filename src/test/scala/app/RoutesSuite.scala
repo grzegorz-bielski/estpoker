@@ -111,6 +111,7 @@ class RoutesSuite extends FunSuite:
       body
     )
     assert(body.contains("<span>Round </span><strong>1</strong>"), body)
+    assert(body.contains("""href="/">leave table</a>"""), body)
     assert(!body.contains("a few days left"), body)
 
   test("dealing seats the creator on a fresh table"):

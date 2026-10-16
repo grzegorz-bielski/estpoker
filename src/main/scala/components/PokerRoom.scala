@@ -101,11 +101,18 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       controls(room, revealed)
     )
 
-  /** The table's name and round, as plain words in the screen's corners — badges got in the way. */
+  /** The table's name and round, as plain words in the screen's corners — badges got in the way. The road
+    * home sits between them, quiet but always in reach.
+    */
   private def marker(room: Rooms.Room): Html =
     div(
-      Attrs.cls := "relative z-10 flex w-full justify-between px-2 text-sm text-stone-300",
+      Attrs.cls := "relative z-10 flex w-full items-center justify-between px-2 text-sm text-stone-300",
       span(span("Table "), strong(Attrs.cls := "tracking-widest text-amber-200", room.session.code)),
+      a(
+        Attrs.cls := "text-xs text-stone-500 transition-colors hover:text-amber-200",
+        Attrs.href := "/",
+        "leave table"
+      ),
       span(span("Round "), strong(room.session.round))
     )
 
