@@ -59,7 +59,8 @@ object Index:
               "Take a seat"
             ),
             div(
-              Attrs.cls := "mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
+              Attrs.cls :=
+                "reveal mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
               Pages.seatForm("/s/join", request.csrf, remembered, code = Some(""))
             )
           ),
@@ -70,7 +71,8 @@ object Index:
               "Deal a table"
             ),
             div(
-              Attrs.cls := "mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
+              Attrs.cls :=
+                "reveal mt-3 rounded-xl border border-amber-600/25 bg-black/40 p-4 backdrop-blur-sm",
               Pages.form(
                 "/",
                 request.csrf,

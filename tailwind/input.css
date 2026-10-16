@@ -58,11 +58,43 @@
 
 /* -- the launch doors ------------------------------------------------------ */
 
+/* -- the launch doors: they open and close like they are felt-hinged -------- */
+
 summary {
   list-style: none;
 }
 summary::-webkit-details-marker {
   display: none;
+}
+
+/* Opening: the panel fades and settles, everywhere (a close snaps — the DOM
+   is still native). The block-size transition then resmooths both directions
+   where ::details-content is known. */
+details .reveal {
+  animation: door-open 0.28s ease-out;
+}
+@keyframes door-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+details .reveal {
+  overflow: clip;
+}
+details::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 0.3s ease,
+    content-visibility 0.3s allow-discrete;
+}
+details[open]::details-content {
+  block-size: auto;
+}
+:root {
+  interpolate-size: allow-keywords;
 }
 
 /* -- cards ----------------------------------------------------------------- */
