@@ -13,5 +13,9 @@ run / outputStrategy := Some(OutputStrategy.StdoutOutput)
 
 Compile / run / mainClass := Some("estpoker.Main")
 
+// The suites share one Postgres and one installed-database slot; running them at once
+// interleaves wipes with reads. One suite at a time keeps each story straight.
+Test / parallelExecution := false
+
 // -- test
 libraryDependencies += "org.scalameta" %% "munit" % "1.3.4" % Test

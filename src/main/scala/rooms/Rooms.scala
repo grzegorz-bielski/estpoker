@@ -78,8 +78,8 @@ object Rooms:
   def room(code: String): Option[Room] = read(snapShot(code))
 
   /** A session and its player, for the seat cookie's handshake. */
-  def seat(playerId: Id[Player], sessionId: Id[PokerSession]): Option[(PokerSession, Player)] =
-    read(seated(playerId, sessionId))
+  /** The session the player sits on, for the seat cookie's handshake. */
+  def sits(playerId: Id[Player]): Option[(PokerSession, Player)] = read(satOn(playerId))
 
   // -- the end of a table ---------------------------------------------------------------------
 
@@ -180,10 +180,11 @@ object Rooms:
       )
     )
 
-  private def seated(playerId: Id[Player], sessionId: Id[PokerSession])(using DB): Option[(PokerSession, Player)] =
+  private def satOn(playerId: Id[Player])(using DB): Option[(PokerSession, Player)] =
     for
       player  <- Table[Player].findById(playerId)
-      session <- Table[PokerSession].findById(player.sessionId.asId) if session.id == sessionId
+      session <- Table[PokerSession].findById(player.sessionId.asId)
+      if session.expiresAt.isAfter(Instant.now())
     yield (session, player)
 
   private def takeDown()(using Tx): Int =
