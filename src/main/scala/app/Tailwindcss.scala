@@ -4,8 +4,8 @@ import io.eezo.http.Body
 import io.eezo.http.Request
 import io.eezo.http.Response
 
-/** `app/Tailwindcss.scala` mounts `GET /tailwindcss`: the compiled stylesheet, on the classpath
-  * in `resources/estpoker/`. The CLI regenerates it; the app ships it.
+/** `app/Tailwindcss.scala` mounts `GET /tailwindcss`: the compiled stylesheet, on the classpath in
+  * `resources/estpoker/`. The CLI regenerates it; the app ships it.
   */
 object Tailwindcss:
 
@@ -18,7 +18,7 @@ object Tailwindcss:
       Response(
         200,
         Seq(
-          "Content-Type"  -> "text/css; charset=utf-8",
+          "Content-Type" -> "text/css; charset=utf-8",
           "Cache-Control" -> "no-cache"
         ),
         Body.Bytes(css)

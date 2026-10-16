@@ -16,31 +16,35 @@ import models.PokerSession
 import rooms.Rooms
 import rooms.TestDb
 
-/** The whole visit, driven through the real route table with no server: landing, creating,
-  * joining by code, the room page, and every door an expired session closes.
+/** The whole visit, driven through the real route table with no server: landing, creating, joining by code,
+  * the room page, and every door an expired session closes.
   */
 class RoutesSuite extends FunSuite:
 
   private def get(path: String, session: Session = Session.empty): Response =
     TestDb.around(
-      Routes.table().dispatch(
-        Request(Method.GET, path, Map.empty, Map.empty, Array.empty, Map.empty, session)
-      )
+      Routes
+        .table()
+        .dispatch(
+          Request(Method.GET, path, Map.empty, Map.empty, Array.empty, Map.empty, session)
+        )
     )
 
   private def post(path: String, fields: String, session: Session): Response =
     TestDb.around(
-      Routes.table().dispatch(
-        Request(
-          Method.POST,
-          path,
-          Map.empty,
-          Map("Content-Type" -> Seq("application/x-www-form-urlencoded")),
-          fields.getBytes(StandardCharsets.UTF_8),
-          Map.empty,
-          session
+      Routes
+        .table()
+        .dispatch(
+          Request(
+            Method.POST,
+            path,
+            Map.empty,
+            Map("Content-Type" -> Seq("application/x-www-form-urlencoded")),
+            fields.getBytes(StandardCharsets.UTF_8),
+            Map.empty,
+            session
+          )
         )
-      )
     )
 
   private def html(response: Response): String = response.body match
@@ -50,14 +54,14 @@ class RoutesSuite extends FunSuite:
   /** One page load, with the session answered back and the token minted on it. */
   private def read(path: String): (Response, String, Session) =
     val response = get(path)
-    val body     = html(response)
-    val token    = """name="_csrf" value="([^"]+)"""".r.findFirstMatchIn(body).get.group(1)
+    val body = html(response)
+    val token = """name="_csrf" value="([^"]+)"""".r.findFirstMatchIn(body).get.group(1)
     (response, token, response.session.getOrElse(fail("no session")))
 
   private def kill(session: PokerSession): Unit =
     TestDb.around(
-      transact(
-        Tx ?=> Table[PokerSession].update(
+      transact(Tx ?=>
+        Table[PokerSession].update(
           session.copy(expiresAt = java.time.Instant.now().minusSeconds(1))
         )
       )
@@ -71,7 +75,7 @@ class RoutesSuite extends FunSuite:
     assertEquals(response.header("Content-Type"), Some("text/css; charset=utf-8"))
     response.body match
       case Body.Bytes(css) =>
-        val sheet  = new String(css, StandardCharsets.UTF_8)
+        val sheet = new String(css, StandardCharsets.UTF_8)
         assert(sheet.contains("btn-deal"), "expected the deal button's class in the sheet")
         assert(sheet.contains("table-felt"), "expected the felt in the sheet")
       case other => fail(s"expected bytes, got $other")
@@ -90,18 +94,18 @@ class RoutesSuite extends FunSuite:
     assertEquals(response.status, 303)
     val location = response.header("Location").getOrElse(fail("no redirect"))
     assert(location.startsWith("/s/"), location)
-    val code    = location.stripPrefix("/s/")
-    val seated  = response.session.getOrElse(fail("no session"))
-    val name    = seated.get("playerName")
+    val code = location.stripPrefix("/s/")
+    val seated = response.session.getOrElse(fail("no session"))
+    val name = seated.get("playerName")
     val seatKey = seated.get(s"seat.$code")
     assertEquals(name, Some("Ada"))
     assert(seatKey.isDefined, "expected a seat in the session")
 
   test("the room page renders the table with the seat's name on it"):
     val (session, mod) = TestDb.around(Rooms.create("Ada"))
-    val (_, token, s)  = read("/")
+    val (_, token, s) = read("/")
     val seated = s.set(s"seat.${session.code}", mod.id.show)
-    val room   = get(s"/s/${session.code}", seated)
+    val room = get(s"/s/${session.code}", seated)
     assertEquals(room.status, 200)
     val body = html(room)
     assert(body.contains("Ada"), body)
@@ -110,12 +114,12 @@ class RoutesSuite extends FunSuite:
 
   test("a stranger on a room link is asked for a name first"):
     val (session, _) = TestDb.around(Rooms.create("Ada"))
-    val response     = get(s"/s/${session.code}")
+    val response = get(s"/s/${session.code}")
     assertEquals(response.status, 303)
     assertEquals(response.header("Location"), Some(s"/s/${session.code}/join"))
 
   test("the join page remembers the name the browser already has"):
-    val (session, _)  = TestDb.around(Rooms.create("Ada"))
+    val (session, _) = TestDb.around(Rooms.create("Ada"))
     val (_, token, s) = read("/")
     val joined = get(
       s"/s/${session.code}/join",
@@ -125,7 +129,7 @@ class RoutesSuite extends FunSuite:
     assert(html(joined).contains("""value="Grace""""))
 
   test("joining seats a named player and walks them into the room"):
-    val (session, _)  = TestDb.around(Rooms.create("Ada"))
+    val (session, _) = TestDb.around(Rooms.create("Ada"))
     val (_, token, s) = read("/")
     val response = post(
       s"/s/${session.code}/join",
@@ -145,12 +149,12 @@ class RoutesSuite extends FunSuite:
 
   test("an unknown code hands you back to the front page"):
     val (_, token, s) = read("/")
-    val response      = post("/s/join", s"_csrf=$token&code=XXXXXX&name=Grace", s)
+    val response = post("/s/join", s"_csrf=$token&code=XXXXXX&name=Grace", s)
     assertEquals(response.status, 303)
     assertEquals(response.header("Location"), Some("/"))
 
   test("an expired code hands you back to the front page too"):
-    val (session, _)  = TestDb.around(Rooms.create("Ada"))
+    val (session, _) = TestDb.around(Rooms.create("Ada"))
     val (_, token, s) = read("/")
     kill(session)
     val response = post(
@@ -165,6 +169,6 @@ class RoutesSuite extends FunSuite:
     val (session, mod) = TestDb.around(Rooms.create("Ada"))
     kill(session)
     val (_, token, s) = read("/")
-    val response      = get(s"/s/${session.code}", s.set(s"seat.${session.code}", mod.id.show))
+    val response = get(s"/s/${session.code}", s.set(s"seat.${session.code}", mod.id.show))
     assertEquals(response.status, 404)
 end RoutesSuite

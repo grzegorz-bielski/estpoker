@@ -12,7 +12,7 @@ object Index:
 
   def index(request: Request): Response =
     val remembered = request.session.get("playerName").getOrElse("")
-    val notice     = request.session.flash("notice")
+    val notice = request.session.flash("notice")
     Pages.shell(
       "estpoker",
       request.csrf,

@@ -12,20 +12,19 @@ import models.Player
 import models.PokerSession
 import models.Vote
 
-/** The tables and their rounds: create, join, play, reveal, reset — every move a hand makes,
-  * plus the expiry sweep that takes a table down when its few days are over. Postgres is the truth
-  * behind every function here; the live component reads through [[room]] and its ticks re-read it
-  * the same way.
+/** The tables and their rounds: create, join, play, reveal, reset — every move a hand makes, plus the expiry
+  * sweep that takes a table down when its few days are over. Postgres is the truth behind every function
+  * here; the live component reads through [[room]] and its ticks re-read it the same way.
   *
-  * Refusals are answers, not exceptions: `play`, `reveal` and `reset` answer `false` and change
-  * nothing, and every open page re-reads the room from the database on its next tick, so a refused
-  * move self-corrects everywhere. The scope stays at the object's front door; every move's work
-  * below is a helper that joins it with `(using Tx)` or `(using DB)`.
+  * Refusals are answers, not exceptions: `play`, `reveal` and `reset` answer `false` and change nothing, and
+  * every open page re-reads the room from the database on its next tick, so a refused move self-corrects
+  * everywhere. The scope stays at the object's front door; every move's work below is a helper that joins it
+  * with `(using Tx)` or `(using DB)`.
   */
 object Rooms:
 
-  /** A sanity gate, deliberately generous: a real scrum table is a few people, and anything past
-    * this is a bug or a bot walking in.
+  /** A sanity gate, deliberately generous: a real scrum table is a few people, and anything past this is a
+    * bug or a bot walking in.
     */
   val maxPlayers: Int = 50
 
@@ -47,17 +46,16 @@ object Rooms:
   /** Deals a fresh table and seats its creator as the moderator. */
   def create(name: String): (PokerSession, Player) = transact(dealTable(name))
 
-  /** Seats a named player on the table the code names. Expired and unknown marks are the same
-    * invitation to leave.
+  /** Seats a named player on the table the code names. Expired and unknown marks are the same invitation to
+    * leave.
     */
   def join(code: String, name: String): Either[JoinError, (PokerSession, Player)] =
     transact(seatUp(code, name))
 
   // -- a hand's moves -------------------------------------------------------------------------
 
-  /** Lays a card down for this round. Laying again replaces the card; a finished round takes
-    * nothing; only cards the deck holds are legal, and when the last player's card lands the
-    * round turns over by itself.
+  /** Lays a card down for this round. Laying again replaces the card; a finished round takes nothing; only
+    * cards the deck holds are legal, and when the last player's card lands the round turns over by itself.
     */
   def play(playerId: Id[Player], sessionId: Id[PokerSession], card: String): Boolean =
     Cards.label(card).isDefined && transact(layCard(playerId, sessionId, card))
@@ -72,8 +70,8 @@ object Rooms:
 
   // -- reading --------------------------------------------------------------------------------
 
-  /** The room as it stands right now: the table and one `Seat` per player, votes attached. All
-    * operands of a tick re-read this, so every page converges on the same truth.
+  /** The room as it stands right now: the table and one `Seat` per player, votes attached. All operands of a
+    * tick re-read this, so every page converges on the same truth.
     */
   def room(code: String): Option[Room] = read(snapShot(code))
 
@@ -83,8 +81,8 @@ object Rooms:
 
   // -- the end of a table ---------------------------------------------------------------------
 
-  /** Takes every table whose few days are over down, votes and players with it. Answers how many
-    * tables went. Child tables go first, because eezo's foreign keys do not cascade.
+  /** Takes every table whose few days are over down, votes and players with it. Answers how many tables went.
+    * Child tables go first, because eezo's foreign keys do not cascade.
     */
   def sweep(): Int = transact(takeDown())
 
@@ -92,9 +90,9 @@ object Rooms:
 
   private def dealTable(name: String)(using Tx): (PokerSession, Player) =
     val sessions = Table[PokerSession]
-    val players  = Table[Player]
-    val seated   = name.trim
-    val now      = Instant.now()
+    val players = Table[Player]
+    val seated = name.trim
+    val now = Instant.now()
     val session = PokerSession(
       Id.gen(),
       unusedCode(),
@@ -108,21 +106,28 @@ object Rooms:
     players.insert(mod)
     (session, mod)
 
-  private def seatUp(code: String, name: String)(using Tx): Either[JoinError, (PokerSession, Player)] =
+  private def seatUp(
+      code: String,
+      name: String
+  )(using Tx): Either[JoinError, (PokerSession, Player)] =
     Table[PokerSession].where(_.code === code.trim).first() match
-      case None => Left(JoinError.Unknown)
+      case None          => Left(JoinError.Unknown)
       case Some(session) =>
         if !session.expiresAt.isAfter(Instant.now()) then Left(JoinError.Expired)
-        else if Table[Player].where(_.sessionId === Ref.to(session.id)).count() >= maxPlayers.toLong then
-          Left(JoinError.Full)
+        else if Table[Player].where(_.sessionId === Ref.to(session.id)).count() >= maxPlayers.toLong
+        then Left(JoinError.Full)
         else
           val player = Player(Id.gen(), Ref.to(session.id), name.trim, mod = false)
           Table[Player].insert(player)
           Right((session, player))
 
-  private def layCard(playerId: Id[Player], sessionId: Id[PokerSession], card: String)(using Tx): Boolean =
+  private def layCard(
+      playerId: Id[Player],
+      sessionId: Id[PokerSession],
+      card: String
+  )(using Tx): Boolean =
     Table[PokerSession].where(_.id === sessionId).first() match
-      case None                       => false
+      case None          => false
       case Some(session) =>
         if session.phase != Phase.Voting then false
         else lay(playerId, session, card)
@@ -136,8 +141,7 @@ object Rooms:
       case Some(existing) => votes.update(existing.copy(card = card))
       case None           =>
         votes.insert(Vote(Id.gen(), Ref.to(session.id), Ref.to(playerId), session.round, card))
-    if everybodyHasLaid(session) then
-      Table[PokerSession].update(session.copy(phase = Phase.Revealed))
+    if everybodyHasLaid(session) then Table[PokerSession].update(session.copy(phase = Phase.Revealed))
     true
 
   private def everybodyHasLaid(session: PokerSession)(using DB): Boolean =
@@ -182,7 +186,7 @@ object Rooms:
 
   private def satOn(playerId: Id[Player])(using DB): Option[(PokerSession, Player)] =
     for
-      player  <- Table[Player].findById(playerId)
+      player <- Table[Player].findById(playerId)
       session <- Table[PokerSession].findById(player.sessionId.asId)
       if session.expiresAt.isAfter(Instant.now())
     yield (session, player)

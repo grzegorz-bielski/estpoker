@@ -11,9 +11,9 @@ import models.Player
 import models.PokerSession
 import models.Vote
 
-/** The round state machine, against real rows. The test database is the one `eezo-pg` Docker
-  * container every eezo example uses; the suite syncs the schema from the models and starts each
-  * suite from an empty set of tables.
+/** The round state machine, against real rows. The test database is the one `eezo-pg` Docker container every
+  * eezo example uses; the suite syncs the schema from the models and starts each suite from an empty set of
+  * tables.
   */
 class RoomsSuite extends FunSuite:
 
@@ -21,7 +21,7 @@ class RoomsSuite extends FunSuite:
 
   private def inTx[A](body: Tx ?=> A): A = TestDb.around(transact(body))
   private def inDb[A](body: DB ?=> A): A = TestDb.around(read(body))
-  private def db[A](body: => A): A       = TestDb.around(body)
+  private def db[A](body: => A): A = TestDb.around(body)
 
   private def wipe()(using Tx): Unit =
     Table[Vote].deleteAll()
@@ -31,11 +31,9 @@ class RoomsSuite extends FunSuite:
   private def clear(): Unit = inTx(wipe())
 
   private def kill(session: PokerSession): Unit =
-    inTx(Tx ?=>
-      Table[PokerSession].update(session.copy(expiresAt = Instant.now().minusSeconds(1)))
-    )
-  private def allVotes: List[Vote]       = inDb(Table[Vote].all())
-  private def allNames: List[String]     = inDb(Table[Player].all().map(_.name))
+    inTx(Tx ?=> Table[PokerSession].update(session.copy(expiresAt = Instant.now().minusSeconds(1))))
+  private def allVotes: List[Vote] = inDb(Table[Vote].all())
+  private def allNames: List[String] = inDb(Table[Player].all().map(_.name))
   private def wholeRoom(code: String) = db(Rooms.room(code)).getOrElse(fail("no room"))
 
   override def beforeEach(context: BeforeEach): Unit = clear()
@@ -49,7 +47,7 @@ class RoomsSuite extends FunSuite:
     assert(mod.mod, "expected the creator to moderate")
 
   test("a join seats a named player on the table the code names"):
-    val (session, _)    = db(Rooms.create("Ada"))
+    val (session, _) = db(Rooms.create("Ada"))
     val (seated, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
     assertEquals(seated.id, session.id)
     assertEquals(grace.name, "Grace")
@@ -72,7 +70,7 @@ class RoomsSuite extends FunSuite:
 
   test("a vote lands, and re-voting replaces it"):
     val (session, mod) = db(Rooms.create("Ada"))
-    val (_, grace)     = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
+    val (_, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
     db(Rooms.play(mod.id, session.id, "8"))
     db(Rooms.play(mod.id, session.id, "5"))
     assertEquals(allVotes.map(_.card), List("5"))
@@ -89,7 +87,7 @@ class RoomsSuite extends FunSuite:
 
   test("when every seated player has voted, the cards turn over by themselves"):
     val (session, mod) = db(Rooms.create("Ada"))
-    val (_, grace)     = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
+    val (_, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
     db(Rooms.play(mod.id, session.id, "8"))
     assertEquals(wholeRoom(session.code).session.phase, Phase.Voting)
     db(Rooms.play(grace.id, session.id, "13"))
@@ -97,7 +95,7 @@ class RoomsSuite extends FunSuite:
 
   test("the moderator may turn the cards over early; a player may not"):
     val (session, mod) = db(Rooms.create("Ada"))
-    val (_, grace)     = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
+    val (_, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
     db(Rooms.play(grace.id, session.id, "13"))
     assertEquals(db(Rooms.reveal(grace.id, session.id)), false)
     assert(db(Rooms.reveal(mod.id, session.id)), "expected the moderator to reveal")
@@ -105,7 +103,7 @@ class RoomsSuite extends FunSuite:
 
   test("a new round lifts the round number, hides the cards and sweeps the table"):
     val (session, mod) = db(Rooms.create("Ada"))
-    val (_, grace)     = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
+    val (_, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
     db(Rooms.play(mod.id, session.id, "8"))
     db(Rooms.play(grace.id, session.id, "13"))
     assertEquals(db(Rooms.reset(grace.id, session.id)), false)
@@ -123,9 +121,9 @@ class RoomsSuite extends FunSuite:
 
   test("the room reads what the table holds"):
     val (session, mod) = db(Rooms.create("Ada"))
-    val (_, grace)     = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
+    val (_, grace) = db(Rooms.join(session.code, "Grace")).getOrElse(fail("expected a seat"))
     db(Rooms.play(grace.id, session.id, "8"))
-    val room  = wholeRoom(session.code)
+    val room = wholeRoom(session.code)
     assertEquals(room.seats.size, 2)
     val graceSeat = room.seats.find(seat => seat.player.name == "Grace").getOrElse(fail("no seat"))
     assertEquals(graceSeat.vote, Some("8"))
@@ -133,9 +131,9 @@ class RoomsSuite extends FunSuite:
     assertEquals(modSeat.vote, None)
 
   test("the expiry sweep takes the whole table down, votes and players with it"):
-    val (dead, _)        = db(Rooms.create("Ada"))
-    val (alive, mod)     = db(Rooms.create("Bob"))
-    val (_, seated)      = db(Rooms.join(dead.code, "Grace")).getOrElse(fail("expected a seat"))
+    val (dead, _) = db(Rooms.create("Ada"))
+    val (alive, mod) = db(Rooms.create("Bob"))
+    val (_, seated) = db(Rooms.join(dead.code, "Grace")).getOrElse(fail("expected a seat"))
     db(Rooms.play(seated.id, dead.id, "5"))
     kill(dead)
     val swept = db(Rooms.sweep())

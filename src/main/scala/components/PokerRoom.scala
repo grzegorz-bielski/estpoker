@@ -16,8 +16,8 @@ object PokerRoom:
   /** A room that moved: play, reveal, reset, and someone taking a seat too. */
   final case class Tick(code: String)
 
-  /** One topic carries every room's news; each page only listens for its own code. In-process,
-    * as the framework says: all this sync lives on one machine, and that is exactly enough.
+  /** One topic carries every room's news; each page only listens for its own code. In-process, as the
+    * framework says: all this sync lives on one machine, and that is exactly enough.
     */
   lazy val changed: Topic[Tick] = new Topic[Tick]
 
@@ -32,10 +32,9 @@ object PokerRoom:
 
 end PokerRoom
 
-/** A live room, run by a deck and a felt. State is nothing but the room as Postgres says it
-  * stands: every card laid, every reveal, is one transaction plus a tick on the room's topic,
-  * and every open page re-reads the room on that tick, so all of them converge on the same
-  * truth. The browser runs none of it.
+/** A live room, run by a deck and a felt. State is nothing but the room as Postgres says it stands: every
+  * card laid, every reveal, is one transaction plus a tick on the room's topic, and every open page re-reads
+  * the room on that tick, so all of them converge on the same truth. The browser runs none of it.
   */
 final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]]:
 
@@ -60,8 +59,8 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       case "reset"       => deal()
       case _             => state
 
-  /** One card laid down: the DB moves, the room's pages are told, and the state is re-read so
-    * this page is as converged as every other, ticks or no ticks.
+  /** One card laid down: the DB moves, the room's pages are told, and the state is re-read so this page is as
+    * converged as every other, ticks or no ticks.
     */
   private def playCard(card: String): Option[Rooms.Room] =
     if Rooms.play(seat.playerId, seat.sessionId, card) then changed.publish(Tick(seat.code))
@@ -94,7 +93,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
 
   private def felted(room: Rooms.Room): Html =
     val revealed = room.session.phase == Phase.Revealed
-    val round    = room.session.round
+    val round = room.session.round
     div(
       Attrs.cls := "flex min-h-screen w-full flex-col items-center px-4 pb-12 pt-8",
       marker(room, round),
@@ -149,8 +148,8 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       else span(place.player.name)
     )
 
-  /** One card: face down until the round shows it, then turned over with a CSS flip. The card's
-    * own DOM never changes shape, so the flip animates and the differ only patches a class.
+  /** One card: face down until the round shows it, then turned over with a CSS flip. The card's own DOM never
+    * changes shape, so the flip animates and the differ only patches a class.
     */
   private def cardFor(room: Rooms.Room, revealed: Boolean, place: Rooms.Seat): Html =
     div(
@@ -190,8 +189,8 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
     if revealed then verdict(room) else hand(room)
 
   private def verdict(room: Rooms.Room): Html =
-    val cards           = room.seats.flatMap(seat => seat.vote.toList)
-    val summary         = Cards.summary(cards)
+    val cards = room.seats.flatMap(seat => seat.vote.toList)
+    val summary = Cards.summary(cards)
     div(
       Attrs.cls := "mt-6 flex w-full max-w-3xl flex-col items-center gap-4",
       div(
@@ -208,9 +207,7 @@ final class PokerRoom(seat: PokerRoom.Seat) extends Component[Option[Rooms.Room]
       ),
       div(
         Attrs.cls := "flex flex-wrap items-center justify-center gap-2",
-        summary.counts.map((face, howMany) =>
-          span(Attrs.cls := "chip", face, " × ", howMany)
-        )
+        summary.counts.map((face, howMany) => span(Attrs.cls := "chip", face, " × ", howMany))
       )
     )
 

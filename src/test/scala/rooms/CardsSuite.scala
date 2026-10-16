@@ -6,7 +6,10 @@ class CardsSuite extends FunSuite:
 
   test("the deck is the classic fib set plus inf, unsure and coffee"):
     val values = Cards.deck.map(_.value)
-    assertEquals(values, List("0", "1", "2", "3", "5", "8", "13", "21", "34", "55", "89", "inf", "unsure", "coffee"))
+    assertEquals(
+      values,
+      List("0", "1", "2", "3", "5", "8", "13", "21", "34", "55", "89", "inf", "unsure", "coffee")
+    )
 
   test("every card shows its intended face"):
     assertEquals(Cards.label("8"), Some("8"))

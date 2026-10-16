@@ -17,5 +17,8 @@ Compile / run / mainClass := Some("estpoker.Main")
 // interleaves wipes with reads. One suite at a time keeps each story straight.
 Test / parallelExecution := false
 
+// The braceless rule is enforced, not aspirational: every compile formats first.
+scalafmtOnCompile := true
+
 // -- test
 libraryDependencies += "org.scalameta" %% "munit" % "1.3.4" % Test

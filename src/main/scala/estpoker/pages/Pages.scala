@@ -5,9 +5,9 @@ import io.eezo.core.html.Tags.*
 import io.eezo.http.Csrf
 import io.eezo.http.Response
 
-/** The shell around every page: dark wood, a felt that carries the light well, the compiled
-  * tailwind stylesheet, and room for the content. Outside `app/` on purpose: files under `app/`
-  * are routes, and this is furniture.
+/** The shell around every page: dark wood, a felt that carries the light well, the compiled tailwind
+  * stylesheet, and room for the content. Outside `app/` on purpose: files under `app/` are routes, and this
+  * is furniture.
   */
 object Pages:
 
@@ -44,15 +44,26 @@ object Pages:
       Attrs.htmlFor := name,
       labelText
     ) ++ input(
-      Seq(Attrs.cls := "field", Attrs.tpe := "text", Attrs.name := name, Attrs.value := value) ++ extra
+      Seq(
+        Attrs.cls := "field",
+        Attrs.tpe := "text",
+        Attrs.name := name,
+        Attrs.value := value
+      ) ++ extra
     )
 
   /** The one control a seat needs: a name. The code itself is where the address decides. */
-  def seatForm(action: String, csrf: Csrf.Token, remembered: String, code: Option[String] = None): Html =
+  def seatForm(
+      action: String,
+      csrf: Csrf.Token,
+      remembered: String,
+      code: Option[String] = None
+  ): Html =
     Pages.form(
       action,
       csrf,
-      (code.map(c => Pages.field("table code", "code", c)).toList :+ Pages.field("your name", "name", remembered))*
+      (code.map(c => Pages.field("table code", "code", c)).toList :+ Pages
+        .field("your name", "name", remembered))*
     ) ++ button(
       Attrs.cls := "btn-deal",
       Attrs.tpe := "submit",
