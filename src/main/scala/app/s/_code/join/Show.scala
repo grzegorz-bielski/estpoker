@@ -7,9 +7,6 @@ import io.eezo.http.Response
 
 import estpoker.pages.Pages
 
-/** `app/s/_code/join/Show.scala` mounts `GET /s/:code/join`: the name form a room link walks an unseated
-  * visitor to. The name comes with them if the browser has been here before.
-  */
 object Show:
 
   def show(request: Request): Response =

@@ -5,10 +5,6 @@ import io.eezo.core.html.Tags.*
 import io.eezo.http.Csrf
 import io.eezo.http.Response
 
-/** The shell around every page: dark wood, a felt that carries the light well, the compiled tailwind
-  * stylesheet, and room for the content. Outside `app/` on purpose: files under `app/` are routes, and this
-  * is furniture.
-  */
 object Pages:
 
   def shell(subject: String, csrf: Csrf.Token, content: Html*): Response =
@@ -27,7 +23,6 @@ object Pages:
       )
     )
 
-  /** One form, sent with the page's own token: a POST without it is refused as forged. */
   def form(action: String, csrf: Csrf.Token, fields: Html*): Html =
     Tags.form(
       Attrs.cls := "flex flex-col gap-4",
@@ -37,7 +32,6 @@ object Pages:
       fields
     )
 
-  /** One labeled input, drawn as a field of any form. */
   def field(labelText: String, name: String, value: String, extra: Attr*): Html =
     label(
       Attrs.cls := "mb-1.5 block text-sm uppercase tracking-wider text-stone-300",
@@ -52,9 +46,6 @@ object Pages:
       ) ++ extra
     )
 
-  /** The one control a seat needs: a name. The code itself is where the address decides. The submit button
-    * rides inside the form — outside one, a browser refuses to fire it.
-    */
   def seatForm(
       action: String,
       csrf: Csrf.Token,

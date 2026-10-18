@@ -6,7 +6,6 @@ import rooms.Rooms
 
 import estpoker.TakeSeat
 
-/** `app/Create.scala` mounts `POST /`: deal a fresh table, seat its creator as the moderator. */
 object Create:
 
   def create(request: Request): Response =

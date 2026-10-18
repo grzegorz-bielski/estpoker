@@ -11,10 +11,6 @@ import models.Player
 import models.PokerSession
 import models.Vote
 
-/** The round state machine, against real rows. The test database is the one `eezo-pg` Docker container every
-  * eezo example uses; the suite syncs the schema from the models and starts each suite from an empty set of
-  * tables.
-  */
 class RoomsSuite extends FunSuite:
 
   TestDb.syncSchema()
@@ -142,4 +138,3 @@ class RoomsSuite extends FunSuite:
     assertEquals(allVotes.count(vote => vote.sessionId == Ref.to(dead.id)), 0)
     assert(!allNames.contains("Grace"), "expected the dead table's players to go")
     assert(db(Rooms.room(alive.code)).isDefined, "expected the live table to stay")
-end RoomsSuite

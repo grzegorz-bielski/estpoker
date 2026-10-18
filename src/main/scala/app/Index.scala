@@ -7,14 +7,8 @@ import io.eezo.http.Response
 
 import estpoker.pages.Pages
 
-/** `app/Index.scala` mounts `GET /`: the launch screen. Two doors, shut until they are knocked on: take a
-  * seat at a table someone else holds, or deal one of your own. The doors are native `details` elements
-  * sharing one `name`, so the browser opens exactly one without a line of script. Set dressing — a spotlight,
-  * a felt pool, drifting suits — comes from `.lobby-scene` in the stylesheet.
-  */
 object Index:
 
-  /** eezo's tag list stops before the disclosure pair; the constructor is right there. */
   private val details = Tag("details")
   private val summary = Tag("summary")
 
@@ -26,7 +20,6 @@ object Index:
       request.csrf,
       main(
         Attrs.cls := "lobby-scene relative flex h-dvh flex-col items-center justify-center px-4",
-        // a gold hairline frames the room, and four suits idle at the edges of the light
         div(
           Attrs.cls :=
             "pointer-events-none absolute inset-2 rounded-3xl ring-1 ring-amber-400/15 sm:inset-4"

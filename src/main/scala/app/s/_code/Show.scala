@@ -11,9 +11,6 @@ import components.PokerRoom
 import models.Player
 import rooms.Rooms
 
-/** `app/s/_code/Show.scala` mounts `GET /s/:code`: the table itself, live. An unseated visitor walks to the
-  * name form first; a room link whose table is gone is a 404, because the invitation died with the table.
-  */
 object Show:
 
   def show(request: Request): Response =
@@ -26,7 +23,6 @@ object Show:
           case Some(seat) =>
             Pages.shell("estpoker", request.csrf, Live.mount(request, PokerRoom(seat)))
 
-  /** The seat the cookie names, only while it still belongs to the table in this address. */
   private def seatOf(request: Request, code: String): Option[PokerRoom.Seat] =
     request.session
       .get(s"seat.$code")

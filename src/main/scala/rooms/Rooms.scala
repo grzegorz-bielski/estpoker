@@ -12,81 +12,38 @@ import models.Player
 import models.PokerSession
 import models.Vote
 
-/** The tables and their rounds: create, join, play, reveal, reset — every move a hand makes, plus the expiry
-  * sweep that takes a table down when its few days are over. Postgres is the truth behind every function
-  * here; the live component reads through [[room]] and its ticks re-read it the same way.
-  *
-  * Refusals are answers, not exceptions: `play`, `reveal` and `reset` answer `false` and change nothing, and
-  * every open page re-reads the room from the database on its next tick, so a refused move self-corrects
-  * everywhere. The scope stays at the object's front door; every move's work below is a helper that joins it
-  * with `(using Tx)` or `(using DB)`.
-  */
 object Rooms:
 
-  /** A sanity gate, deliberately generous: a real scrum table is a few people, and anything past this is a
-    * bug or a bot walking in.
-    */
   val maxPlayers: Int = 50
 
-  /** A table lives a few days, then its invite dies. */
   val ttl: Duration = Duration.ofDays(3)
 
-  /** Why a join did not seat anybody. */
   enum JoinError:
     case Unknown, Expired, Full
 
-  /** One seat around the table, its card shown only when the room says so. */
   final case class Seat(player: Player, vote: Option[String])
 
-  /** A room snapshot: the table and every seat on it, for this round. */
   final case class Room(session: PokerSession, seats: List[Seat])
 
-  // -- opening a table ------------------------------------------------------------------------
-
-  /** Deals a fresh table and seats its creator as the moderator. */
   def create(name: String): (PokerSession, Player) = transact(dealTable(name))
 
-  /** Seats a named player on the table the code names. Expired and unknown marks are the same invitation to
-    * leave.
-    */
   def join(code: String, name: String): Either[JoinError, (PokerSession, Player)] =
     transact(seatUp(code, name))
 
-  // -- a hand's moves -------------------------------------------------------------------------
-
-  /** Lays a card down for this round. Laying again replaces the card; a finished round takes nothing; only
-    * cards the deck holds are legal, and when the last player's card lands the round turns over by itself.
-    */
   def play(playerId: Id[Player], sessionId: Id[PokerSession], card: String): Boolean =
     Cards.label(card).isDefined && transact(layCard(playerId, sessionId, card))
 
-  /** A moderator turning the cards over before everyone has voted. */
   def reveal(playerId: Id[Player], sessionId: Id[PokerSession]): Boolean =
     transact(turnCards(playerId, sessionId))
 
-  /** A moderator dealing the next round: the count goes up, the cards hide, the table clears. */
   def reset(playerId: Id[Player], sessionId: Id[PokerSession]): Boolean =
     transact(dealAgain(playerId, sessionId))
 
-  // -- reading --------------------------------------------------------------------------------
-
-  /** The room as it stands right now: the table and one `Seat` per player, votes attached. All operands of a
-    * tick re-read this, so every page converges on the same truth.
-    */
   def room(code: String): Option[Room] = read(snapShot(code))
 
-  /** A session and its player, for the seat cookie's handshake. */
-  /** The session the player sits on, for the seat cookie's handshake. */
   def sits(playerId: Id[Player]): Option[(PokerSession, Player)] = read(satOn(playerId))
 
-  // -- the end of a table ---------------------------------------------------------------------
-
-  /** Takes every table whose few days are over down, votes and players with it. Answers how many tables went.
-    * Child tables go first, because eezo's foreign keys do not cascade.
-    */
   def sweep(): Int = transact(takeDown())
-
-  // -- inside the box: one helper per move, with the scope it joins named in its argument ------
 
   private def dealTable(name: String)(using Tx): (PokerSession, Player) =
     val sessions = Table[PokerSession]
@@ -200,14 +157,12 @@ object Rooms:
     )
     gone.size
 
-  /** A session that still has days left, or nothing. */
   private def live(code: String)(using DB): Option[PokerSession] =
     Table[PokerSession]
       .where(_.code === code.trim)
       .first()
       .filter(_.expiresAt.isAfter(Instant.now()))
 
-  /** The session the player sits on, only when that player is the moderator. */
   private def moderator(playerId: Id[Player])(using DB): Option[(PokerSession, Player)] =
     Table[Player]
       .where(p => p.id === playerId)
@@ -225,8 +180,6 @@ object Rooms:
 
   private val codeRand = SecureRandom()
 
-  /** Six characters no one misreads over a phone call: `0O` and `1IL` are out of the alphabet. */
   private def newCode(): String =
     val alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ24689"
     (0 until 6).map(i => alphabet.charAt(codeRand.nextInt(alphabet.length))).mkString
-end Rooms
